@@ -11,8 +11,7 @@ const Navbar = ({ setPage }) => {
 
   return (
     // تم مسح shadow-sm لضمان عدم ظهور أي خط أو ظل
-    <nav className="fixed top-0 left-0 w-full py-5 px-6 lg:px-16 flex justify-between items-center z-50 bg-[#f4f1ea]/95 backdrop-blur-md box-border">
-      
+<nav className="relative w-full py-5 px-6 lg:px-16 flex justify-between items-center z-50 bg-[#f4f1ea]/95 backdrop-blur-md box-border">      
       <div className="flex items-center gap-6 lg:gap-12">
         <div 
           className="cursor-pointer flex items-center shrink-0" 
