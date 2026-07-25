@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import logoImg from '../assets/logo.png'; 
 
 const Navbar = ({ setPage }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -19,8 +18,9 @@ const Navbar = ({ setPage }) => {
           className="cursor-pointer flex items-center shrink-0" 
           onClick={() => handleNavigation('home', '/')}
         >
+           {/* تم تعديل مسار الصورة هنا ليقرأ من مجلد public مباشرة */}
            <img 
-             src={logoImg} 
+             src="/logo.png" 
              alt="شركة لاماسو" 
              className="h-14 lg:h-20 w-auto object-contain drop-shadow-sm" 
            />
