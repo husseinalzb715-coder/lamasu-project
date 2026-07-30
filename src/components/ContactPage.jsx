@@ -1,6 +1,59 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 const ContactPage = () => {
+  // حالة (State) لحفظ بيانات الفورمة
+  const [formData, setFormData] = useState({
+    Name: '',
+    Phone: '', // تمت إضافة الهاتف بناءً على تصميمك
+    Email: '',
+    Message: ''
+  });
+
+  // حالة للتحكم برسائل النجاح أو الخطأ
+  const [status, setStatus] = useState({ message: '', type: '' });
+  // حالة للتحكم بزر الإرسال أثناء التحميل
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // دالة لتحديث البيانات عند الكتابة
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  // دالة إرسال البيانات إلى الـ API
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setStatus({ message: 'جاري الإرسال...', type: 'info' });
+
+    try {
+      // جلب الرابط من ملف .env
+      const apiUrl = `${import.meta.env.VITE_API_BASE_URL}/api/Contact`;
+      
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setStatus({ message: data.message || 'تم استلام رسالتك بنجاح!', type: 'success' });
+        // تفريغ الحقول بعد النجاح
+        setFormData({ Name: '', Phone: '', Email: '', Message: '' });
+      } else {
+        setStatus({ message: 'حدث خطأ يرجى التأكد من البيانات المدخلة.', type: 'error' });
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      setStatus({ message: 'عذراً، لا يمكن الاتصال بالخادم حالياً.', type: 'error' });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="w-full bg-[#f4f1ea] pt-32 pb-24 min-h-screen">
       <div className="container mx-auto px-6 lg:px-16 max-w-7xl">
@@ -49,30 +102,82 @@ const ContactPage = () => {
             </div>
 
             {/* فورمة المراسلة */}
-            <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
+            <form className="space-y-5" onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
                   <label className="block text-[#0d122b] font-bold mb-2">الاسم الكامل</label>
-                  <input type="text" placeholder="اكتب اسمك هنا" className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[#cde000] focus:ring-0 transition-colors outline-none bg-gray-50 focus:bg-white" />
+                  <input 
+                    type="text" 
+                    name="Name"
+                    value={formData.Name}
+                    onChange={handleChange}
+                    required
+                    placeholder="اكتب اسمك هنا" 
+                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[#cde000] focus:ring-0 transition-colors outline-none bg-gray-50 focus:bg-white" 
+                  />
                 </div>
                 <div>
                   <label className="block text-[#0d122b] font-bold mb-2">رقم الهاتف</label>
-                  <input type="tel" placeholder="07XX XXX XXXX" className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[#cde000] focus:ring-0 transition-colors outline-none bg-gray-50 focus:bg-white text-right" dir="ltr" />
+                  <input 
+                    type="tel" 
+                    name="Phone"
+                    value={formData.Phone}
+                    onChange={handleChange}
+                    placeholder="07XX XXX XXXX" 
+                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[#cde000] focus:ring-0 transition-colors outline-none bg-gray-50 focus:bg-white text-right" 
+                    dir="ltr" 
+                  />
                 </div>
               </div>
               
               <div>
                 <label className="block text-[#0d122b] font-bold mb-2">البريد الإلكتروني</label>
-                <input type="email" placeholder="example@lamassu.com" className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[#cde000] focus:ring-0 transition-colors outline-none bg-gray-50 focus:bg-white text-right" dir="ltr" />
+                <input 
+                  type="email" 
+                  name="Email"
+                  value={formData.Email}
+                  onChange={handleChange}
+                  required
+                  placeholder="example@lamassu.com" 
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[#cde000] focus:ring-0 transition-colors outline-none bg-gray-50 focus:bg-white text-right" 
+                  dir="ltr" 
+                />
               </div>
 
               <div>
                 <label className="block text-[#0d122b] font-bold mb-2">رسالتك</label>
-                <textarea rows="4" placeholder="كيف يمكننا مساعدتك؟" className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[#cde000] focus:ring-0 transition-colors outline-none bg-gray-50 focus:bg-white resize-none"></textarea>
+                <textarea 
+                  name="Message"
+                  value={formData.Message}
+                  onChange={handleChange}
+                  required
+                  rows="4" 
+                  placeholder="كيف يمكننا مساعدتك؟" 
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[#cde000] focus:ring-0 transition-colors outline-none bg-gray-50 focus:bg-white resize-none"
+                ></textarea>
               </div>
 
-              <button type="submit" className="w-full bg-[#0d122b] text-white font-bold text-lg py-4 rounded-xl hover:bg-[#cde000] hover:text-[#0d122b] transition-all duration-300">
-                إرسال الرسالة
+              {/* عرض حالة الإرسال (نجاح أو خطأ) */}
+              {status.message && (
+                <div className={`p-4 rounded-xl font-bold ${
+                  status.type === 'success' ? 'bg-green-100 text-green-700' : 
+                  status.type === 'error' ? 'bg-red-100 text-red-700' : 
+                  'bg-blue-100 text-blue-700'
+                }`}>
+                  {status.message}
+                </div>
+              )}
+
+              <button 
+                type="submit" 
+                disabled={isSubmitting}
+                className={`w-full font-bold text-lg py-4 rounded-xl transition-all duration-300 ${
+                  isSubmitting 
+                    ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
+                    : 'bg-[#0d122b] text-white hover:bg-[#cde000] hover:text-[#0d122b]'
+                }`}
+              >
+                {isSubmitting ? 'جاري الإرسال...' : 'إرسال الرسالة'}
               </button>
             </form>
           </div>
